@@ -10,7 +10,7 @@ body{
     display: none;
 }
 .HighlightedText{
-    width: 100%;
+    width: 75.5%;
     margin: 30px 30px;
     border-radius: 10px;
     padding: 20px;
@@ -58,6 +58,10 @@ span{
     background-image: url(https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQfWbB640lxeD4tVh_FpmeWaHO094naSHz0bw&s);
     background-size: contain;
     padding: 5px;
+    cursor: pointer;
+}
+#download:hover{
+    transform: scale(1.5);
 }
 input,select{
     border: 2px solid white;

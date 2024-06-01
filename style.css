@@ -1,6 +1,9 @@
 /* .highlight {
   background-color: yellow;
 } */
+.active {
+  border: 2px dashed black;
+}
 .main{
   height: 15px;
   width: 7vw;

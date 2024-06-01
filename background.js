@@ -74,6 +74,26 @@ chrome.runtime.onMessage.addListener((msg, sender) => {
   }
 });
 
+// Implementing Keyboard Shortcuts
+chrome.commands.onCommand.addListener(function (command) {
+  if (command === 'toggle_highlight') {
+    chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
+      chrome.tabs.sendMessage(tabs[0].id, {action: "toggle_highlight"});
+    });
+  } else if (command === 'next_highlight') {
+    chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
+      chrome.tabs.sendMessage(tabs[0].id, {action: "next_highlight"});
+    });
+  } else if (command === 'previous_highlight') {
+    chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
+      chrome.tabs.sendMessage(tabs[0].id, {action: "previous_highlight"});
+    });
+  } else if (command === 'clear_highlights') {
+    chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
+      chrome.tabs.sendMessage(tabs[0].id, {action: "clear_highlights"});
+    });
+  }
+});
 
 
 

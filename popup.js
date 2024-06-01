@@ -1,4 +1,3 @@
-
 var Dates = [];
 const setDOMInfo = info => {
   Dates = [];
@@ -19,7 +18,7 @@ const setDOMInfo = info => {
     else if(info[i].colour == "#81E3E1" || info[i].colour == 'rgb(129, 227, 225)') div1.style.color = 'rgb(10 158 155)';
     else if(info[i].colour == "#B3E561" || info[i].colour == 'rgb(179, 229, 97)') div1.style.color = 'rgb(89 136 13)';
     span.innerText = info[i].Date;
-    p.innerText = info[i].innerText;
+    p.innerText = info[i].innerText+'\n\nComment: '+info[i].textareaText;
     p.style.backgroundColor = div1.style.backgroundColor;
     span.style.backgroundColor = div1.style.backgroundColor;
     let button = document.createElement('button');
@@ -56,6 +55,11 @@ const attachEventListeners = () => {
   if (dateSelect) {
     dateSelect.addEventListener('change', sortDivs);
   }
+
+  const download = document.getElementById('download');
+  if (download) {
+    download.addEventListener('click', popup);
+  }
 };
 
 
@@ -80,6 +84,68 @@ window.addEventListener('DOMContentLoaded', () => {
 
 
 
+async function popup(){
+  let value = prompt("To Download in .txt format=> Enter '1'\nTo Download in .html format=> Enter '2'\nTo Download in .pdf format=> Enter '3'","")
+  if(value=="1"){
+    let color = [];
+    let divs = document.getElementsByClassName('HighlightedText');
+    for(let j=0;j<divs.length;j++){
+      if(divs[j].style.backgroundColor == "#95C8F3" || divs[j].style.backgroundColor == 'rgb(149, 200, 243)') color[j] = 'Blue';
+    else if(divs[j].style.backgroundColor == "#FFDC74" || divs[j].style.backgroundColor == 'rgb(255, 220, 116)') color[j] = 'Yellow';
+    else if(divs[j].style.backgroundColor == "#FBAC87" || divs[j].style.backgroundColor == 'rgb(251, 172, 135)') color[j] = 'Red';
+    else if(divs[j].style.backgroundColor == "#F3A6C8" || divs[j].style.backgroundColor == 'rgb(243, 166, 200)') color[j] = 'Pink';
+    else if(divs[j].style.backgroundColor == "#AEB5FF" || divs[j].style.backgroundColor == 'rgb(174, 181, 255)') color[j] = 'Purple';
+    else if(divs[j].style.backgroundColor == "#81E3E1" || divs[j].style.backgroundColor == 'rgb(129, 227, 225)') color[j] = 'Cyan';
+    else if(divs[j].style.backgroundColor == "#B3E561" || divs[j].style.backgroundColor == 'rgb(179, 229, 97)') color[j] = 'Green';
+    }
+    console.log(Array.from(divs));
+    let textContent = Array.from(divs).map((h, k) => {
+      if (!h.classList.contains('hide')) {
+          return `(Colour:[${color[k]}]) ${h.querySelector('p').innerText} (Saved on: ${h.querySelector('span').innerText})`;
+      } else {
+          return '';
+      }
+    }).filter(item => item !== '').join('\n\n');
+    console.log(textContent);
+    let blob = new Blob([textContent], { type: 'text/plain' });
+    let url = URL.createObjectURL(blob);
+    let a = document.createElement('a');
+    a.href = url;
+    a.download = 'highlights.txt';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+  else if(value=="2"){
+    let divs = document.getElementsByClassName('HighlightedText');
+    let textContent = Array.from(divs).map((h, k) => {
+      if (!h.classList.contains('hide')) {
+          return h.outerHTML;
+      } else {
+          return '';
+      }
+    }).filter(item => item !== '').join('\n');
+    let blob = new Blob([textContent], { type: 'text/plain' });
+    let url = URL.createObjectURL(blob);
+    let a = document.createElement('a');
+    a.href = url;
+    a.download = 'highlights.html';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+  else if(value=="3"){
+    document.body.style.fontSize='20px';
+    document.getElementsByClassName('navbar')[0].style.display = 'none';
+    let d = document.getElementsByClassName('bt');
+    for(let i=0;i<d.length;i++) d[i].style.visibility = "hidden";
+    await html2pdf().from(document.body).save('output.pdf');
+    for(let i=0;i<d.length;i++) d[i].style.visibility = "visible";
+    document.getElementsByClassName('navbar')[0].style.display = 'flex';
+    document.body.style.fontSize='';
+  }
+  else{
+    alert("Your entered value matches with none option\nPlease try again and enter a valid input.")
+  }
+}
 
 
 
@@ -109,7 +175,6 @@ function searchDivs() {
   }
 }
 
-var tempo = [];
 
 // Add event listener to the select field to trigger the sort on change
 // document.getElementById('dateSelect').addEventListener('change', sortDivs);
@@ -136,7 +201,6 @@ function sortDivs() {
     console.log(document.getElementsByClassName('navbar')[0]);
     document.body.innerHTML = document.getElementsByClassName('navbar')[0].outerHTML;
     console.log(document.body.innerHTML);
-    console.log(tempo);
     chrome.tabs.query({
       active: true,
       currentWindow: true
@@ -157,7 +221,6 @@ function sortDivs() {
     // Get all div elements
     const divs = document.getElementsByClassName('HighlightedText');
     var temp = Array.from(divs);
-    var tempo = Array.from(divs);
     // for(let j=0;j<divs.length;j++){
 
     // Function to get the background color of an element

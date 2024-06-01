@@ -1,5 +1,5 @@
 console.log("Staring contents.js");
-
+var but3 = 0;
 // chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 //   console.log(message.action);
 //   if (message.action === "highlightText") {
@@ -14,7 +14,23 @@ document.addEventListener('click', function (event) {
   const highlightedText = event.target;
   // Check if the element has the class 'highlight'
   // Create an option button if it doesn't exist already
+  const slides1 = document.getElementsByClassName('highlight');
+  for (let i = 0; i < slides1.length; i++) {
+    if(slides1[i].classList.contains('active')){
+      slides1[i].classList.remove('active');
+    }
+  }
+  var z=0;
   if (!document.querySelector('.hover-option-button') && highlightedText.classList.contains('highlight')) {
+    for (z = 0; z < slides1.length; z++) {
+      if(slides1[z].innerHTML==highlightedText.innerHTML){
+        console.log(highlightedText.innerHTML);
+        slides1[z].classList.add('active');
+        break;
+      }
+    }
+    console.log(z);
+    console.log(slides1[z].classList);
     console.log("Clicked on span");
     let div = document.createElement('div');
     document.body.appendChild(div);
@@ -33,10 +49,17 @@ document.addEventListener('click', function (event) {
     button3.classList.add('hover-option-button-hover');
 
 
+    // Get the bounding rectangle of the element
+    var rect = slides1[z].getBoundingClientRect();
+
+    // Calculate the pageX and pageY coordinates using scroll offsets
+    var pageX = rect.left + (window.pageXOffset || document.documentElement.scrollLeft);
+    var pageY = rect.top + (window.pageYOffset || document.documentElement.scrollTop);
+
     // Position the button near the highlighted text
     div.style.position = 'absolute';
-    div.style.top = `${event.pageY + 5}px`; // Adjust position slightly below the cursor
-    div.style.left = `${event.pageX + 5}px`; // Adjust position slightly to the right of the cursor
+    div.style.top = `${pageY + 25}px`; // Adjust position slightly below the cursor
+    div.style.left = `${pageX + 25}px`; // Adjust position slightly to the right of the cursor
 
     // Remove the button when mouse leaves
     document.addEventListener('click', function () {
@@ -45,7 +68,10 @@ document.addEventListener('click', function (event) {
       }
     }, { once: true });
 
-
+    if(but3){
+      but3=0;
+      document.getElementsByClassName('hover-option-button-hover')[2].click();
+    }
 
     // Button to change color of highlight 
     button1.addEventListener('click',()=>{
@@ -83,8 +109,8 @@ document.addEventListener('click', function (event) {
       buttons7.classList.add('hover-option-button');
       
       div2.style.position = 'absolute';
-      div2.style.top = `${event.pageY + 25}px`; // Adjust position slightly below the cursor
-      div2.style.left = `${event.pageX + 5}px`;
+      div2.style.top = `${pageY + 25}px`; // Adjust position slightly below the cursor
+      div2.style.left = `${pageX + 25}px`;
 
       document.body.appendChild(div2);
       console.log(document.getElementsByClassName('main2')[0]);
@@ -93,9 +119,13 @@ document.addEventListener('click', function (event) {
       div.remove();
 
       document.addEventListener('click', function (e) {
-        if (div2 && !div.contains(e.target)) {
+          console.log(z);
+        if (div2 && !div.contains(e.target) && e.target!=slides1[z]) {
+          console.log(slides1[z]);
+          slides1[z].classList.remove('active');
+          console.log("Devil removing it");
           div2.remove();
-      }
+        }
       });
 
 
@@ -183,8 +213,8 @@ document.addEventListener('click', function (event) {
       
         // Position the textarea near the highlighted text
         textarea.style.position = 'absolute';
-        textarea.style.top = `${event.pageY+25}px`;
-        textarea.style.left = `${event.pageX+5}px`;
+        textarea.style.top = `${pageY+25}px`;
+        textarea.style.left = `${pageX+25}px`;
         textarea.style.backgroundColor = h.colour;
         textarea.value = highlights2[i].textareaText;
       
@@ -231,6 +261,7 @@ document.addEventListener('click', function (event) {
         console.log(i);
         highlights2.splice(i,1);
         localStorage.setItem('highlights', JSON.stringify(highlights2));
+        slides1[z].classList.remove('active');
         return;
       }
       });
@@ -542,3 +573,69 @@ chrome.runtime.onMessage.addListener((msg, sender, response) => {
     response(domInfo);
   }
 });
+
+
+// Implementing Keyborad Shortcuts by listening messsage from background.js
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+  if (request.action === "toggle_highlight") {
+    highlightText("#FFDC74");
+  } else if (request.action === "next_highlight") {
+    goToNextHighlight();
+  } else if (request.action === "previous_highlight") {
+    goToPreviousHighlight();
+  } else if (request.action === "clear_highlights") {
+    deleteHighlight();
+  }
+});
+
+function goToNextHighlight() {
+  // Implement the logic to navigate to the next highlight
+  let slides1 = Array.from(document.getElementsByClassName('highlight'));
+  const slides2 = slides1.filter(d => d.style.backgroundColor!='transparent');
+  for (let i = 0; i < slides2.length-1; i++) {
+    if(slides2[i].classList.contains('active')){
+      slides2[i+1].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      slides2[i+1].click();
+      break;
+    }
+    if(i==slides2.length-2){
+      slides2[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      slides2[0].click();
+    }
+  }
+}
+
+function goToPreviousHighlight() {
+  // Implement the logic to navigate to the previous highlight
+  let slides1 = Array.from(document.getElementsByClassName('highlight'));
+  const slides2 = slides1.filter(d => d.style.backgroundColor!='transparent');
+  console.log("Previous chosen");
+  let done = 0;
+  for (let i = 1; i < slides2.length; i++) {
+    if(slides2[i].classList.contains('active')){
+      slides2[i-1].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      slides2[i-1].click();
+      done = 1;
+      break;
+    }
+  }
+  if(!done){
+    console.log(slides2.length-1);
+    console.log(slides2[slides2.length-1]);
+    slides2[slides2.length-1].scrollIntoView({ behavior: 'smooth', block: 'center' });
+    slides2[slides2.length-1].click();
+  }
+}
+
+async function deleteHighlight() {
+  // Implement the logic to clear all highlights
+  const slides2 = document.getElementsByClassName('highlight');
+  for (let i = 0; i < slides2.length; i++) {
+    if(slides2[i].classList.contains('active')){
+      but3=3;
+      await slides2[i].click();
+      break;
+    }
+  }
+  console.log(but3);
+}
