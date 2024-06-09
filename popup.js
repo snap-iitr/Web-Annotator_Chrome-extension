@@ -1,3 +1,4 @@
+var Download_type = 0;
 var Dates = [];
 const setDOMInfo = info => {
   Dates = [];
@@ -85,8 +86,11 @@ window.addEventListener('DOMContentLoaded', () => {
 
 
 async function popup(){
-  let value = prompt("To Download in .txt format=> Enter '1'\nTo Download in .html format=> Enter '2'\nTo Download in .pdf format=> Enter '3'","")
-  if(value=="1"){
+  let value = 0;
+  if(Download_type==0){
+    let value = prompt("To Download in .txt format=> Enter '1'\nTo Download in .html format=> Enter '2'\nTo Download in .pdf format=> Enter '3'","");
+  }
+  if(value=="1" || Download_type == 1){
     let color = [];
     let divs = document.getElementsByClassName('HighlightedText');
     for(let j=0;j<divs.length;j++){
@@ -115,7 +119,7 @@ async function popup(){
     a.click();
     URL.revokeObjectURL(url);
   }
-  else if(value=="2"){
+  else if(value=="2" || Download_type == 2){
     let divs = document.getElementsByClassName('HighlightedText');
     let textContent = Array.from(divs).map((h, k) => {
       if (!h.classList.contains('hide')) {
@@ -132,7 +136,7 @@ async function popup(){
     a.click();
     URL.revokeObjectURL(url);
   }
-  else if(value=="3"){
+  else if(value=="3" || Download_type == 3){
     document.body.style.fontSize='20px';
     document.getElementsByClassName('navbar')[0].style.display = 'none';
     let d = document.getElementsByClassName('bt');
@@ -247,4 +251,56 @@ function sortDivs() {
   }
 }
 
-
+document.addEventListener('keydown', function (event) {
+  console.log(event.ctrlKey,event.key);
+  if (event.ctrlKey && (event.key === 'F' || event.key === 'f')) {
+    event.preventDefault();
+    if (document.getElementById('keyword')) {
+      document.getElementById('keyword').focus();
+      searchDivs();
+    }
+  }
+  else if(event.ctrlKey && !event.shiftKey && (event.key === 'D' || event.key === 'd')){
+    event.preventDefault();
+    if (document.getElementById('dateSelect')) {
+      document.getElementById('dateSelect').focus();
+      document.getElementById('dateSelect').value = 'Date';
+      sortDivs();
+    }
+  }
+  else if(event.ctrlKey && (event.key === 'S' || event.key === 's')){
+    event.preventDefault();
+    if (document.getElementById('dateSelect')) {
+      document.getElementById('dateSelect').focus();
+      document.getElementById('dateSelect').value = 'style';
+      sortDivs();
+    }
+  }
+  else if(event.ctrlKey && event.shiftKey && (event.key === 'D' || event.key === 'd')){
+    event.preventDefault();
+    if (document.getElementById('download')) {
+      popup();
+    }
+  }
+  else if(event.ctrlKey && (event.key === 'T' || event.key === 't')){
+    event.preventDefault();
+    if (document.getElementById('download')) {
+      Download_type = 1;
+      popup();
+    }
+  }
+  else if(event.ctrlKey && (event.key === 'H' || event.key === 'h')){
+    event.preventDefault();
+    if (document.getElementById('download')) {
+      Download_type = 2;
+      popup();
+    }
+  }
+  else if(event.ctrlKey && (event.key === 'P' || event.key === 'p')){
+    event.preventDefault();
+    if (document.getElementById('download')) {
+      Download_type = 3;
+      popup();
+    }
+  }
+});

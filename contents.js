@@ -7,9 +7,6 @@ var but3 = 0;
 //   }
 // });
 
-
-
-
 document.addEventListener('click', function (event) {
   const highlightedText = event.target;
   // Check if the element has the class 'highlight'
@@ -592,6 +589,10 @@ function goToNextHighlight() {
   // Implement the logic to navigate to the next highlight
   let slides1 = Array.from(document.getElementsByClassName('highlight'));
   const slides2 = slides1.filter(d => d.style.backgroundColor!='transparent');
+  if(slides2.length==1){
+    slides2[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+    slides2[0].click();
+  }
   for (let i = 0; i < slides2.length-1; i++) {
     if(slides2[i].classList.contains('active')){
       slides2[i+1].scrollIntoView({ behavior: 'smooth', block: 'center' });
