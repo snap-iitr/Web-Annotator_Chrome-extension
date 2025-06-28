@@ -4,12 +4,12 @@ const setDOMInfo = info => {
   Dates = [];
   console.log(info);
   for(let i=0;i<info.length;i++){
-    Dates.push(info[i].Date);
+    Dates.push(info[i].highlightId);
     let div1 = document.createElement('div');
     let span = document.createElement('span');
     let p = document.createElement('p');
     div1.classList.add('HighlightedText');
-    div1.setAttribute("id",info[i].id.toString()+"*");
+    div1.setAttribute("id",info[i].highlightId.toString()+"*");
     div1.style.backgroundColor = info[i].colour;
     if(info[i].colour == "#95C8F3" || info[i].colour == 'rgb(149, 200, 243)') div1.style.color = 'rgb(14 105 182)';
     else if(info[i].colour == "#FFDC74" || info[i].colour == 'rgb(255, 220, 116)') div1.style.color = 'rgb(176 137 20)';
@@ -18,14 +18,14 @@ const setDOMInfo = info => {
     else if(info[i].colour == "#AEB5FF" || info[i].colour == 'rgb(174, 181, 255)') div1.style.color = 'rgb(20 34 179)';
     else if(info[i].colour == "#81E3E1" || info[i].colour == 'rgb(129, 227, 225)') div1.style.color = 'rgb(10 158 155)';
     else if(info[i].colour == "#B3E561" || info[i].colour == 'rgb(179, 229, 97)') div1.style.color = 'rgb(89 136 13)';
-    span.innerText = info[i].Date;
+    span.innerText = info[i].highlightId;
     p.innerText = info[i].innerText+'\n\nComment: '+info[i].textareaText;
     p.style.backgroundColor = div1.style.backgroundColor;
     span.style.backgroundColor = div1.style.backgroundColor;
     let button = document.createElement('button');
     button.innerText = "Copy";
     button.classList.add("bt");
-    button.setAttribute("id",info[i].id);
+    button.setAttribute("id",info[i].highlightId);
     div1.appendChild(button);
     div1.appendChild(p);
     div1.appendChild(span);
@@ -63,32 +63,10 @@ const attachEventListeners = () => {
   }
 };
 
-
-
-// Once the DOM is ready...
-window.addEventListener('DOMContentLoaded', () => {
-  // ...query for the active tab...
-  chrome.tabs.query({
-    active: true,
-    currentWindow: true
-  }, tabs => {
-    // ...and send a request for the DOM info...
-    chrome.tabs.sendMessage(
-        tabs[0].id,
-        {from: 'popup', subject: 'DOMInfo'},
-        // ...also specifying a callback to be called 
-        //    from the receiving end (content script).
-        setDOMInfo);
-  });
-});
-
-
-
-
 async function popup(){
   let value = 0;
   if(Download_type==0){
-    let value = prompt("To Download in .txt format=> Enter '1'\nTo Download in .html format=> Enter '2'\nTo Download in .pdf format=> Enter '3'","");
+    value = prompt("To Download in .txt format=> Enter '1'\nTo Download in .html format=> Enter '2'\nTo Download in .pdf format=> Enter '3'","");
   }
   if(value=="1" || Download_type == 1){
     let color = [];
@@ -165,14 +143,11 @@ function searchDivs() {
   // Loop through all div elements
   for (let i = 0; i < divs.length; i++) {
       const div = divs[i].querySelector('p');
-      console.log(div);
       // Check if the inner text of the div contains the keyword
       if (div.innerText.toLowerCase().includes(keyword)) {
-        console.log("IF");
           // Add highlight class to the div
           divs[i].classList.remove('hide');
       } else if(keyword !="") {
-        console.log("ELSE");
           // Remove highlight class from the div
           divs[i].classList.add('hide');
       }
@@ -187,24 +162,7 @@ function sortDivs() {
   // Get the selected date from the select field
   const selected = document.getElementById('dateSelect').value;
   if(selected == 'Date'){
-
-    // const divs = document.getElementsByClassName('HighlightedText');
-    // let temp = divs.length;
-    // // Show divs that have a span element with inner text containing the selected date
-    // for(let j=0;j<temp;j++){
-    //   divs[j].parentNode.removeChild(divs[j]);
-    // }
-    // console.log(divs);
-
-    // window.document.dispatchEvent(new Event("DOMContentLoaded", {
-    //   bubbles: true,
-    //   cancelable: true
-    // }));
-
-    console.log(document.body.innerHTML);
-    console.log(document.getElementsByClassName('navbar')[0]);
     document.body.innerHTML = document.getElementsByClassName('navbar')[0].outerHTML;
-    console.log(document.body.innerHTML);
     chrome.tabs.query({
       active: true,
       currentWindow: true
@@ -218,9 +176,6 @@ function sortDivs() {
           setDOMInfo);
     });
   }
-
-
-
   else if(selected=='style'){
     // Get all div elements
     const divs = document.getElementsByClassName('HighlightedText');
@@ -239,17 +194,23 @@ function sortDivs() {
     });
     const body = document.body;
     sortedDivs.forEach(div => body.appendChild(div));
-
-    // if(divs[j].style.backgroundColor == "#95C8F3" || divs[j].style.backgroundColor == 'rgb(149, 200, 243)') div1.style.color = 'rgb(14 105 182)';
-    // else if(divs[j].style.backgroundColor == "#FFDC74" || divs[j].style.backgroundColor == 'rgb(255, 220, 116)') div1.style.color = 'rgb(176 137 20)';
-    // else if(divs[j].style.backgroundColor == "#FBAC87" || divs[j].style.backgroundColor == 'rgb(251, 172, 135)') div1.style.color = 'rgb(158 63 18)';
-    // else if(divs[j].style.backgroundColor == "#F3A6C8" || divs[j].style.backgroundColor == 'rgb(243, 166, 200)') div1.style.color = 'rgb(206 30 108)';
-    // else if(divs[j].style.backgroundColor == "#AEB5FF" || divs[j].style.backgroundColor == 'rgb(174, 181, 255)') div1.style.color = 'rgb(20 34 179)';
-    // else if(divs[j].style.backgroundColor == "#81E3E1" || divs[j].style.backgroundColor == 'rgb(129, 227, 225)') div1.style.color = 'rgb(10 158 155)';
-    // else if(divs[j].style.backgroundColor == "#B3E561" || divs[j].style.backgroundColor == 'rgb(179, 229, 97)') div1.style.color = 'rgb(89 136 13)';
-  // }
   }
 }
+
+// Once the DOM is ready...
+window.addEventListener('DOMContentLoaded', () => {
+  // ...query for the active tab...
+  chrome.tabs.query({
+    active: true,
+    currentWindow: true
+  }, tabs => {
+    // ...and send a request for the DOM info...
+    chrome.tabs.sendMessage(
+        tabs[0].id,
+        {from: 'popup', subject: 'DOMInfo'},
+        setDOMInfo);
+  });
+});
 
 document.addEventListener('keydown', function (event) {
   console.log(event.ctrlKey,event.key);

@@ -1,7 +1,9 @@
+console.log("Starting Background JS")
 const tldLocales = {
   'highlightText': 'Highlight text'
 }
 
+// Colour Creation
 const highlightColors = [
   { id: 'highlightYellow', title: 'Yellow', colorcode: '#FFDC74' },
   { id: 'highlightRed', title: 'Red', colorcode: '#FBAC87' },
@@ -12,6 +14,7 @@ const highlightColors = [
   { id: 'highlightGreen', title: 'Green', colorcode: '#B3E561' },
 ];
   
+// Making a place for my extension on dialog box when open on right click on some selected text
 chrome.runtime.onInstalled.addListener(async () => {
   for (let [tld, locale] of Object.entries(tldLocales)) {
     chrome.contextMenus.create({
@@ -33,18 +36,14 @@ chrome.runtime.onInstalled.addListener(async () => {
   }
 });
 
+// Response after user click on highlight text button in dialog box
 chrome.contextMenus.onClicked.addListener((info, tab) => {
   console.log("CLICKED");
-  console.log(info);
-  console.log(tab);
   var colour = "yellow";
   if (highlightColors.find(c => c.id === info.menuItemId)) {
     highlightColors.forEach(color =>{
-      console.log(color.id,info.menuItemId,info.menuItemId.toString());
       if(color.id==info.menuItemId.toString()){
-        console.log("truee");
         colour = color.colorcode;
-        console.log(colour);
       }
     })
     chrome.tabs.query({active: true, currentWindow: true}).then(([tab]) => {
@@ -58,21 +57,19 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
   }
 });
   
+// Redirect funtion to go on contents.js
 function highlightTextredirect(colour) {
   console.log("clicked");
-  console.log(colour);
   highlightText(colour);
 }
 
-
-
-chrome.runtime.onMessage.addListener((msg, sender) => {
-  // First, validate the message's structure.
-  if ((msg.from === 'content') && (msg.subject === 'showPageAction')) {
-    // Enable the page-action for the requesting tab.
-    chrome.pageAction.show(sender.tab.id);
-  }
-});
+// chrome.runtime.onMessage.addListener((msg, sender) => {
+//   // First, validate the message's structure.
+//   if ((msg.from === 'content') && (msg.subject === 'showPageAction')) {
+//     // Enable the page-action for the requesting tab.
+//     chrome.pageAction.show(sender.tab.id);
+//   }
+// });
 
 // Implementing Keyboard Shortcuts
 chrome.commands.onCommand.addListener(function (command) {
@@ -94,9 +91,6 @@ chrome.commands.onCommand.addListener(function (command) {
     });
   }
 });
-
-
-
 
 // chrome.webNavigation.onCompleted.addListener(
 //   function () {
